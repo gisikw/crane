@@ -76,3 +76,77 @@ func TestParseArgs_EmptyPrompt(t *testing.T) {
 		t.Errorf("expected empty prompt, got %q", opts.Prompt)
 	}
 }
+
+func TestParseArgs_AllowedTools_Single(t *testing.T) {
+	opts, err := ParseArgs([]string{"--allowed-tools", "Bash", "hello"}, Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(opts.AllowedTools) != 1 {
+		t.Errorf("expected 1 allowed tool, got %d", len(opts.AllowedTools))
+	}
+	if opts.AllowedTools[0] != "Bash" {
+		t.Errorf("allowed tool = %q, want Bash", opts.AllowedTools[0])
+	}
+}
+
+func TestParseArgs_AllowedTools_Multiple_CommaSeparated(t *testing.T) {
+	opts, err := ParseArgs([]string{"--allowed-tools", "Bash,Edit,Read", "hello"}, Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(opts.AllowedTools) != 3 {
+		t.Errorf("expected 3 allowed tools, got %d", len(opts.AllowedTools))
+	}
+	expected := []string{"Bash", "Edit", "Read"}
+	for i, tool := range expected {
+		if opts.AllowedTools[i] != tool {
+			t.Errorf("allowed tool[%d] = %q, want %q", i, opts.AllowedTools[i], tool)
+		}
+	}
+}
+
+func TestParseArgs_AllowedTools_Multiple_SpaceSeparated(t *testing.T) {
+	opts, err := ParseArgs([]string{"--allowed-tools", "Bash Edit Read", "hello"}, Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(opts.AllowedTools) != 3 {
+		t.Errorf("expected 3 allowed tools, got %d", len(opts.AllowedTools))
+	}
+	expected := []string{"Bash", "Edit", "Read"}
+	for i, tool := range expected {
+		if opts.AllowedTools[i] != tool {
+			t.Errorf("allowed tool[%d] = %q, want %q", i, opts.AllowedTools[i], tool)
+		}
+	}
+}
+
+func TestParseArgs_DisallowedTools_Single(t *testing.T) {
+	opts, err := ParseArgs([]string{"--disallowed-tools", "Bash", "hello"}, Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(opts.DisallowedTools) != 1 {
+		t.Errorf("expected 1 disallowed tool, got %d", len(opts.DisallowedTools))
+	}
+	if opts.DisallowedTools[0] != "Bash" {
+		t.Errorf("disallowed tool = %q, want Bash", opts.DisallowedTools[0])
+	}
+}
+
+func TestParseArgs_DisallowedTools_Multiple(t *testing.T) {
+	opts, err := ParseArgs([]string{"--disallowed-tools", "Bash,Edit", "hello"}, Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(opts.DisallowedTools) != 2 {
+		t.Errorf("expected 2 disallowed tools, got %d", len(opts.DisallowedTools))
+	}
+	expected := []string{"Bash", "Edit"}
+	for i, tool := range expected {
+		if opts.DisallowedTools[i] != tool {
+			t.Errorf("disallowed tool[%d] = %q, want %q", i, opts.DisallowedTools[i], tool)
+		}
+	}
+}

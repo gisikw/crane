@@ -12,6 +12,26 @@ rep --provider opencode --model "ollama/qwen3:32b" "fix the build"
 rep --dir /path/to/project "run the tests and fix failures"
 ```
 
+### Flags
+
+- `--provider <name>`: Force a specific provider (claude, cursor, opencode)
+- `--model <model>`: Override model selection
+- `--dir <path>`: Working directory for the agent
+- `--system-prompt <text>`: Append system prompt
+- `--no-permissions`: Skip permission checks (default)
+- `--with-permissions`: Enable permission prompts
+- `--allowed-tools <tools>`: Whitelist specific tools (Claude only, incompatible with `--no-permissions`)
+- `--disallowed-tools <tools>`: Blacklist specific tools (Claude only, incompatible with `--no-permissions`)
+
+Tool names can be comma or space-separated. Examples:
+```bash
+rep --with-permissions --allowed-tools "Bash,Edit,Read" "fix the tests"
+rep --with-permissions --allowed-tools "Bash Edit Read" "fix the tests"
+rep --with-permissions --disallowed-tools "Write" "review this code"
+```
+
+Note: `--allowed-tools` and `--disallowed-tools` only work with the Claude provider and require `--with-permissions` mode. They expose Claude CLI's fine-grained tool permission controls.
+
 ## Configuration
 
 Rep reads `~/.config/rep/config.toml`:

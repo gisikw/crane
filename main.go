@@ -51,11 +51,13 @@ func main() {
 	// Build and run the command
 	adapter := GetAdapter(provider)
 	cmd := adapter.Build(InvokeRequest{
-		Prompt:       opts.Prompt,
-		Model:        firstNonEmpty(opts.Model, cfg.ProviderConfig(provider).Model),
-		SystemPrompt: opts.SystemPrompt,
-		Dir:          opts.Dir,
-		AllowAll:     opts.AllowAll,
+		Prompt:          opts.Prompt,
+		Model:           firstNonEmpty(opts.Model, cfg.ProviderConfig(provider).Model),
+		SystemPrompt:    opts.SystemPrompt,
+		Dir:             opts.Dir,
+		AllowAll:        opts.AllowAll,
+		AllowedTools:    opts.AllowedTools,
+		DisallowedTools: opts.DisallowedTools,
 	})
 
 	cmd.Stdout = os.Stdout

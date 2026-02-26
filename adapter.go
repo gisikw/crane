@@ -8,11 +8,13 @@ import (
 
 // InvokeRequest is the provider-agnostic input for an agent invocation.
 type InvokeRequest struct {
-	Prompt       string
-	Model        string
-	SystemPrompt string
-	Dir          string
-	AllowAll     bool
+	Prompt          string
+	Model           string
+	SystemPrompt    string
+	Dir             string
+	AllowAll        bool
+	AllowedTools    []string
+	DisallowedTools []string
 }
 
 // Adapter builds an exec.Cmd for a specific provider.
@@ -41,6 +43,16 @@ func (a ClaudeAdapter) Build(req InvokeRequest) *exec.Cmd {
 	args := []string{"-p", "--output-format", "text"}
 	if req.AllowAll {
 		args = append(args, "--dangerously-skip-permissions")
+	} else {
+		// Tool filters are only compatible with permission mode (not skip-permissions)
+		if len(req.AllowedTools) > 0 {
+			args = append(args, "--allowed-tools")
+			args = append(args, req.AllowedTools...)
+		}
+		if len(req.DisallowedTools) > 0 {
+			args = append(args, "--disallowed-tools")
+			args = append(args, req.DisallowedTools...)
+		}
 	}
 	if req.Model != "" {
 		args = append(args, "--model", req.Model)

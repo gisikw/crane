@@ -121,6 +121,57 @@ func TestGetAdapter_Defaults(t *testing.T) {
 	}
 }
 
+func TestClaudeAdapter_AllowedTools(t *testing.T) {
+	a := ClaudeAdapter{}
+	cmd := a.Build(InvokeRequest{
+		Prompt:       "hello",
+		AllowAll:     false,
+		AllowedTools: []string{"Bash", "Edit", "Read"},
+	})
+	args := cmd.Args[1:]
+	assertContains(t, args, "--allowed-tools")
+	assertContains(t, args, "Bash")
+	assertContains(t, args, "Edit")
+	assertContains(t, args, "Read")
+	// Should not include skip-permissions
+	for _, arg := range args {
+		if arg == "--dangerously-skip-permissions" {
+			t.Error("should not include --dangerously-skip-permissions when AllowAll is false")
+		}
+	}
+}
+
+func TestClaudeAdapter_DisallowedTools(t *testing.T) {
+	a := ClaudeAdapter{}
+	cmd := a.Build(InvokeRequest{
+		Prompt:          "hello",
+		AllowAll:        false,
+		DisallowedTools: []string{"Bash", "Write"},
+	})
+	args := cmd.Args[1:]
+	assertContains(t, args, "--disallowed-tools")
+	assertContains(t, args, "Bash")
+	assertContains(t, args, "Write")
+}
+
+func TestClaudeAdapter_ToolsIgnoredWithAllowAll(t *testing.T) {
+	a := ClaudeAdapter{}
+	cmd := a.Build(InvokeRequest{
+		Prompt:       "hello",
+		AllowAll:     true,
+		AllowedTools: []string{"Bash", "Edit"},
+	})
+	args := cmd.Args[1:]
+	// Should include skip-permissions
+	assertContains(t, args, "--dangerously-skip-permissions")
+	// Should not include tool flags
+	for _, arg := range args {
+		if arg == "--allowed-tools" || arg == "--disallowed-tools" {
+			t.Errorf("should not include tool flags when AllowAll is true, got %q", arg)
+		}
+	}
+}
+
 func TestExitCode(t *testing.T) {
 	code := exitCode(nil)
 	if code != 1 {

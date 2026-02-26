@@ -7,12 +7,14 @@ import (
 
 // Options holds the parsed command-line options.
 type Options struct {
-	Prompt       string
-	Provider     string // Empty means "use config preference order"
-	Model        string
-	Dir          string
-	SystemPrompt string
-	AllowAll     bool
+	Prompt          string
+	Provider        string // Empty means "use config preference order"
+	Model           string
+	Dir             string
+	SystemPrompt    string
+	AllowAll        bool
+	AllowedTools    []string
+	DisallowedTools []string
 }
 
 // ParseArgs parses CLI arguments into Options.
@@ -48,6 +50,18 @@ func ParseArgs(args []string, cfg Config) (Options, error) {
 			}
 			i++
 			opts.SystemPrompt = args[i]
+		case "--allowed-tools":
+			if i+1 >= len(args) {
+				return opts, fmt.Errorf("--allowed-tools requires a value")
+			}
+			i++
+			opts.AllowedTools = parseToolList(args[i])
+		case "--disallowed-tools":
+			if i+1 >= len(args) {
+				return opts, fmt.Errorf("--disallowed-tools requires a value")
+			}
+			i++
+			opts.DisallowedTools = parseToolList(args[i])
 		case "--no-permissions":
 			opts.AllowAll = true
 		case "--with-permissions":
@@ -64,4 +78,20 @@ func ParseArgs(args []string, cfg Config) (Options, error) {
 
 	opts.Prompt = strings.Join(positional, " ")
 	return opts, nil
+}
+
+// parseToolList splits a comma or space-separated list of tool names.
+func parseToolList(s string) []string {
+	var tools []string
+	// First split by comma
+	parts := strings.Split(s, ",")
+	for _, part := range parts {
+		// Then split each part by space
+		for _, tool := range strings.Fields(part) {
+			if tool != "" {
+				tools = append(tools, tool)
+			}
+		}
+	}
+	return tools
 }
