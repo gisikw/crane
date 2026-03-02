@@ -11,7 +11,7 @@ Don't just ignore it.
 - Rep is a dispatcher, not an orchestrator. It picks a provider, invokes it, returns the result. No multi-step pipelines, no state between invocations, no retry logic.
 - Provider selection is config-driven, not dynamic. A config file says "prefer cursor, fall back to claude, then opencode." Rep walks the list until one works.
 - "Works" means the binary exists and is callable. Rep does not check token budgets, subscription status, or API quotas — that's a future concern and will be a separate mechanism if/when it matters.
-- Rep does not interpret agent output. It captures stdout/stderr and exit code. The caller decides what to do with it.
+- Rep does not interpret agent output. It captures stdout/stderr and exit code. The caller decides what to do with it. **Exception**: when `--charge-code` is set and the provider is Claude, Rep buffers stdout, parses the JSON response to extract usage metadata (written to JSONL), and writes the `result` text field to stdout. Cursor and OpenCode output is similarly buffered and parsed when `--charge-code` is set. This is the one sanctioned case where Rep interprets provider output.
 
 ## Interface
 

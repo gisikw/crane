@@ -15,6 +15,7 @@ type Options struct {
 	AllowAll        bool
 	AllowedTools    []string
 	DisallowedTools []string
+	ChargeCode      string // Tag invocation for cost attribution; empty means no logging
 }
 
 // ParseArgs parses CLI arguments into Options.
@@ -66,6 +67,15 @@ func ParseArgs(args []string, cfg Config) (Options, error) {
 			opts.AllowAll = true
 		case "--with-permissions":
 			opts.AllowAll = false
+		case "--charge-code":
+			if i+1 >= len(args) {
+				return opts, fmt.Errorf("--charge-code requires a value")
+			}
+			i++
+			if err := validateChargeCode(args[i]); err != nil {
+				return opts, err
+			}
+			opts.ChargeCode = args[i]
 		case "--help", "-h":
 			return opts, fmt.Errorf("help requested")
 		default:

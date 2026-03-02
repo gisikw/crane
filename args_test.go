@@ -135,6 +135,33 @@ func TestParseArgs_DisallowedTools_Single(t *testing.T) {
 	}
 }
 
+func TestParseArgs_ChargeCode(t *testing.T) {
+	opts, err := ParseArgs([]string{"--charge-code", "exocortex", "do stuff"}, Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if opts.ChargeCode != "exocortex" {
+		t.Errorf("charge code = %q, want exocortex", opts.ChargeCode)
+	}
+	if opts.Prompt != "do stuff" {
+		t.Errorf("prompt = %q, want do stuff", opts.Prompt)
+	}
+}
+
+func TestParseArgs_ChargeCodeMissingValue(t *testing.T) {
+	_, err := ParseArgs([]string{"--charge-code"}, Config{})
+	if err == nil {
+		t.Error("expected error when --charge-code has no value")
+	}
+}
+
+func TestParseArgs_ChargeCodeInvalidChars(t *testing.T) {
+	_, err := ParseArgs([]string{"--charge-code", "foo/bar"}, Config{})
+	if err == nil {
+		t.Error("expected error for charge code with invalid characters")
+	}
+}
+
 func TestParseArgs_DisallowedTools_Multiple(t *testing.T) {
 	opts, err := ParseArgs([]string{"--disallowed-tools", "Bash,Edit", "hello"}, Config{})
 	if err != nil {

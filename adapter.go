@@ -15,6 +15,7 @@ type InvokeRequest struct {
 	AllowAll        bool
 	AllowedTools    []string
 	DisallowedTools []string
+	CaptureUsage    bool // When true, adapters switch to JSON output mode for usage extraction
 }
 
 // Adapter builds an exec.Cmd for a specific provider.
@@ -40,7 +41,11 @@ func GetAdapter(provider string) Adapter {
 type ClaudeAdapter struct{}
 
 func (a ClaudeAdapter) Build(req InvokeRequest) *exec.Cmd {
-	args := []string{"-p", "--output-format", "text"}
+	outputFormat := "text"
+	if req.CaptureUsage {
+		outputFormat = "json"
+	}
+	args := []string{"-p", "--output-format", outputFormat}
 	if req.AllowAll {
 		args = append(args, "--dangerously-skip-permissions")
 	} else {
@@ -78,7 +83,11 @@ func (a CursorAdapter) Build(req InvokeRequest) *exec.Cmd {
 		fullPrompt = req.SystemPrompt + "\n\n" + req.Prompt
 	}
 
-	args := []string{"-p", fullPrompt, "--output-format", "text"}
+	outputFormat := "text"
+	if req.CaptureUsage {
+		outputFormat = "json"
+	}
+	args := []string{"-p", fullPrompt, "--output-format", outputFormat}
 	if req.AllowAll {
 		args = append(args, "--force")
 	}
@@ -109,6 +118,9 @@ type OpencodeAdapter struct{}
 
 func (a OpencodeAdapter) Build(req InvokeRequest) *exec.Cmd {
 	args := []string{"run"}
+	if req.CaptureUsage {
+		args = append(args, "--format", "json")
+	}
 	if req.Model != "" {
 		args = append(args, "--model", req.Model)
 	}

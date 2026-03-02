@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -23,6 +25,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "  --dir <path>         Working directory for the agent\n")
 		fmt.Fprintf(os.Stderr, "  --system-prompt <s>  Append system prompt\n")
 		fmt.Fprintf(os.Stderr, "  --no-permissions     Skip permission checks (default: true)\n")
+		fmt.Fprintf(os.Stderr, "  --charge-code <code> Tag invocation for cost attribution\n")
 		os.Exit(1)
 	}
 
@@ -58,18 +61,54 @@ func main() {
 		AllowAll:        opts.AllowAll,
 		AllowedTools:    opts.AllowedTools,
 		DisallowedTools: opts.DisallowedTools,
+		CaptureUsage:    opts.ChargeCode != "",
 	})
 
-	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	if err := cmd.Run(); err != nil {
-		if exitErr, ok := err.(*os.PathError); ok {
+	var runErr error
+	if opts.ChargeCode != "" {
+		var buf bytes.Buffer
+		cmd.Stdout = &buf
+		runErr = cmd.Run()
+
+		stdout, rec, _ := parseProviderOutput(provider, buf.Bytes())
+		os.Stdout.Write(stdout) //nolint:errcheck
+
+		rec.Timestamp = time.Now().UTC().Format(time.RFC3339)
+		rec.Provider = provider
+		rec.Model = firstNonEmpty(opts.Model, cfg.ProviderConfig(provider).Model)
+		rec.ChargeCode = opts.ChargeCode
+
+		if err := AppendChargeRecord(opts.ChargeCode, rec); err != nil {
+			fmt.Fprintf(os.Stderr, "rep: charge record: %v\n", err)
+		}
+	} else {
+		cmd.Stdout = os.Stdout
+		runErr = cmd.Run()
+	}
+
+	if runErr != nil {
+		if exitErr, ok := runErr.(*os.PathError); ok {
 			fmt.Fprintf(os.Stderr, "rep: provider %q not found: %v\n", provider, exitErr)
 			os.Exit(1)
 		}
 		// Mirror the agent's exit code
-		os.Exit(exitCode(err))
+		os.Exit(exitCode(runErr))
+	}
+}
+
+// parseProviderOutput dispatches to the appropriate output parser based on provider.
+func parseProviderOutput(provider string, output []byte) ([]byte, UsageRecord, error) {
+	switch provider {
+	case "claude":
+		return processClaudeOutput(output)
+	case "cursor":
+		return processCursorOutput(output)
+	case "opencode":
+		return processOpencodeOutput(output)
+	default:
+		return output, UsageRecord{}, nil
 	}
 }
 

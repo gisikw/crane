@@ -121,6 +121,27 @@ func TestGetAdapter_Defaults(t *testing.T) {
 	}
 }
 
+func TestClaudeAdapter_CaptureUsage(t *testing.T) {
+	a := ClaudeAdapter{}
+	cmd := a.Build(InvokeRequest{Prompt: "hello", CaptureUsage: true})
+	assertContains(t, cmd.Args[1:], "--output-format")
+	assertContains(t, cmd.Args[1:], "json")
+}
+
+func TestCursorAdapter_CaptureUsage(t *testing.T) {
+	a := CursorAdapter{}
+	cmd := a.Build(InvokeRequest{Prompt: "hello", CaptureUsage: true})
+	assertContains(t, cmd.Args[1:], "--output-format")
+	assertContains(t, cmd.Args[1:], "json")
+}
+
+func TestOpencodeAdapter_CaptureUsage(t *testing.T) {
+	a := OpencodeAdapter{}
+	cmd := a.Build(InvokeRequest{Prompt: "hello", CaptureUsage: true})
+	assertContains(t, cmd.Args[1:], "--format")
+	assertContains(t, cmd.Args[1:], "json")
+}
+
 func TestClaudeAdapter_AllowedTools(t *testing.T) {
 	a := ClaudeAdapter{}
 	cmd := a.Build(InvokeRequest{
