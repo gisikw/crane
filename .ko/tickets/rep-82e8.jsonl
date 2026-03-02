@@ -1,0 +1,16 @@
+{"event":"build_start","ticket":"rep-82e8","ts":"2026-03-02T15:59:45Z"}
+{"event":"workflow_start","ticket":"rep-82e8","ts":"2026-03-02T15:59:45Z","workflow":"main"}
+{"event":"node_start","node":"classify","ticket":"rep-82e8","ts":"2026-03-02T15:59:45Z","workflow":"main"}
+{"event":"node_complete","node":"classify","result":"route","ticket":"rep-82e8","ts":"2026-03-02T15:59:52Z","workflow":"main"}
+{"event":"workflow_start","ticket":"rep-82e8","ts":"2026-03-02T15:59:52Z","workflow":"task"}
+{"event":"node_start","node":"plan","ticket":"rep-82e8","ts":"2026-03-02T15:59:52Z","workflow":"task"}
+{"event":"node_complete","node":"plan","result":"done","ticket":"rep-82e8","ts":"2026-03-02T16:01:09Z","workflow":"task"}
+{"event":"node_start","node":"actionable","ticket":"rep-82e8","ts":"2026-03-02T16:01:09Z","workflow":"task"}
+{"event":"node_complete","node":"actionable","result":"continue","ticket":"rep-82e8","ts":"2026-03-02T16:01:40Z","workflow":"task"}
+{"event":"node_start","node":"implement","ticket":"rep-82e8","ts":"2026-03-02T16:01:40Z","workflow":"task"}
+{"event":"node_complete","node":"implement","result":"done","ticket":"rep-82e8","ts":"2026-03-02T16:03:25Z","workflow":"task"}
+{"event":"node_start","node":"verify","ticket":"rep-82e8","ts":"2026-03-02T16:03:25Z","workflow":"task"}
+{"event":"node_complete","node":"verify","result":"done","ticket":"rep-82e8","ts":"2026-03-02T16:03:26Z","workflow":"task"}
+{"event":"node_start","node":"review","ticket":"rep-82e8","ts":"2026-03-02T16:03:26Z","workflow":"task"}
+{"event":"node_complete","node":"review","result":"continue","ticket":"rep-82e8","ts":"2026-03-02T16:04:07Z","workflow":"task"}
+{"event":"build_complete","outcome":"succeed","ticket":"rep-82e8","ts":"2026-03-02T16:04:07Z"}

@@ -11,3 +11,5 @@ loop complete: 1 processed (0 succeeded, 1 failed, 0 blocked, 0 decomposed)
 stopped: empty
 {"blocked":0,"decomposed":0,"failed":1,"runtime_seconds":249.323837922,"stop_reason":"empty","succeeded":0,"tickets_processed":1,"ts":"2026-03-02T15:45:32Z"}
 loop: building rep-fc77 — Add --charge-code flag with per-run JSONL usage logging
+loop: rep-fc77 SUCCEED
+loop: building rep-82e8 — Add rep usage <code> subcommand for retrieving accumulated usage

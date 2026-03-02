@@ -10,6 +10,11 @@ import (
 )
 
 func main() {
+	if len(os.Args) >= 2 && os.Args[1] == "usage" {
+		cmdUsage(os.Args[2:])
+		return
+	}
+
 	cfg, err := LoadConfig()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "rep: config error: %v\n", err)
@@ -20,6 +25,7 @@ func main() {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "rep: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Usage: rep [flags] [prompt]\n")
+		fmt.Fprintf(os.Stderr, "       rep usage <charge-code> [--json]\n")
 		fmt.Fprintf(os.Stderr, "  --provider <name>    Force a specific provider\n")
 		fmt.Fprintf(os.Stderr, "  --model <model>      Override model selection\n")
 		fmt.Fprintf(os.Stderr, "  --dir <path>         Working directory for the agent\n")
