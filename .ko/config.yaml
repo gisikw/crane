@@ -1,0 +1,5 @@
+project:
+  prefix: rep
+
+pipeline:
+  from: ~/Projects/hoard/pipelines/coding
